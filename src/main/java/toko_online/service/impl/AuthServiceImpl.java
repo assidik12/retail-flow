@@ -17,7 +17,6 @@ import toko_online.model.dto.response.UserResponse;
 import toko_online.model.entity.User;
 import toko_online.model.enums.Role;
 import toko_online.repository.UserRepository;
-import toko_online.security.JwtService;
 import toko_online.security.TokenProvider;
 import toko_online.service.AuthService;
 

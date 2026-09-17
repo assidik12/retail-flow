@@ -31,6 +31,35 @@ Arsitektur berlapis dengan **Interface Abstraction** memisahkan Presentation (Co
 
 ## 🏛️ Arsitektur Sistem (Clean Architecture)
 
+![Diagram Arsitektur RetailFlow](diagram.png)
+
+### 🧩 Keterangan Diagram Alur Komponen Arsitektur
+
+Diagram di atas menggambarkan alur dan interaksi antar komponen dalam sistem RetailFlow dari entrypoint aplikasi hingga penyimpanan data:
+
+1. **Spring Boot Entrypoint**
+   - Menginisialisasi seluruh konfigurasi aplikasi, HTTP API, dan rantai keamanan Spring Security.
+
+2. **HTTP API (Presentation Layer)**
+   - **REST Controllers**: Boundary utama yang menangani request/response HTTP.
+   - **OpenAPI Docs**: Integrasi Swagger UI (`OpenApiConfig.java`) untuk dokumentasi API interaktif.
+   - **Request/Response DTOs**: Model validasi input dan pengembalian data terstandarisasi via `ApiResponse<T>`.
+   - **Global Error Contract**: Penanganan exception global (`GlobalExceptionHandler`) untuk error response JSON konsisten.
+
+3. **Security & Identity (Keamanan & Autentikasi)**
+   - **Security Filter Chain & RBAC**: Menjaga endpoint terlindungi berdasarkan role pengguna (`USER` / `ADMIN`).
+   - **JWT Authentication Filter**: Memeriksa dan memverifikasi Authorization Bearer Token pada setiap protected request.
+   - **Authentication Service & JWT Service (`TokenProvider`)**: Menangani penerbitan, validasi token, serta enkripsi password.
+   - **User Details Loader & Error Handlers**: Mengambil data principal pengguna dan menangani skenario Unauthorized (401) / Forbidden (403).
+
+4. **Business & Persistence (Logika Bisnis & Akses Data)**
+   - **Product Service & Repository**: Pengelolaan katalog produk, pembaruan stok, dan query JDBC.
+   - **Transaction Service & Repository**: Eksekusi checkout atomik, penguncian stok (*pessimistic locking*), pembuatan record `Transaction` dan `TransactionDetail`.
+
+5. **Database Lifecycle (Basis Data & Migrasi)**
+   - **Flyway Schema & Seed Migration**: Otomasi eksekusi DDL schema (`V1__create_schema.sql`) dan seeding data awal (`R__init_data.sql`).
+   - **MySQL Durable Database**: Media penyimpanan relational utama berbasis MySQL 8.0+.
+
 ```mermaid
 graph TD
     CLIENT[Client / SPA / Mobile / Swagger UI] -->|HTTPS + JWT| FILTER[JwtAuthenticationFilter]
